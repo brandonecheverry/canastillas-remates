@@ -42,6 +42,7 @@ const products = [
       "Punto ecologico con 3 papeleras de 55 lts c/u en colores verde, blanco, rojo o negro.",
     icon: <Trash2 className="w-7 h-7" />,
     specs: ["93cm ancho x 92cm alto x 38.6cm fondo", "3 papeleras de 55 lts", "Multiples colores"],
+    image: "/images/punto-ecologico.png",
   },
   {
     title: "Mobiliario Industrial",
