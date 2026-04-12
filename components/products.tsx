@@ -25,6 +25,7 @@ const products = [
       "Estibas plasticas industriales de alta resistencia para optimizar el almacenamiento y logistica.",
     icon: <Layers className="w-7 h-7" />,
     specs: ["Resistentes a humedad", "Facil limpieza", "Larga vida util"],
+    image: "/images/estiba.png",
   },
   {
     title: "Lockers Metalicos",
@@ -102,6 +103,7 @@ export function Products() {
               description={product.description}
               icon={product.icon}
               specs={product.specs}
+              image={product.image}
             />
           ))}
         </div>
