@@ -50,6 +50,7 @@ const products = [
       "Mesas redondas metalicas 60x60x73 alt con pintura electrostatica negra. Sillas en polietileno reciclado.",
     icon: <UtensilsCrossed className="w-7 h-7" />,
     specs: ["Mesa 60x60x73 cm", "Pintura electrostatica", "Material reciclado"],
+    image: "/images/mobiliario.png",
   },
   {
     title: "Escritorios",
