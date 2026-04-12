@@ -34,6 +34,7 @@ const products = [
       "Lockers en lamina cold rolled con soldadura MIG y pintura electrostatica. Color a convenir.",
     icon: <Lock className="w-7 h-7" />,
     specs: ["Lamina cold rolled", "Soldadura MIG", "Pintura electrostatica"],
+    image: "/images/locker.png",
   },
   {
     title: "Punto Ecologico",
