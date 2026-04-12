@@ -65,6 +65,7 @@ const products = [
       "Estanteria semi pesada de ensamble con perforacion aguacate, terminada en pintura electrostatica.",
     icon: <Archive className="w-7 h-7" />,
     specs: ["Semi pesada y liviana", "Perforacion aguacate", "Color a convenir"],
+    image: "/images/estanteria.png",
   },
   {
     title: "Senalizacion",
