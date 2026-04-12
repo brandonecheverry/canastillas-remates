@@ -18,6 +18,7 @@ const products = [
       "Gran variedad de canastillas plasticas para almacenamiento y transporte en el sector alimenticio e industrial.",
     icon: <Box className="w-7 h-7" />,
     specs: ["Multiples tamanos", "Alta durabilidad", "Apilables"],
+    image: "/images/canastillas.png",
   },
   {
     title: "Estibas Plasticas",
