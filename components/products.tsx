@@ -57,6 +57,7 @@ const products = [
       "Superficie en tablex de 25mm enchapado en formica, base metalica y archivador en lamina cold rolled.",
     icon: <FileText className="w-7 h-7" />,
     specs: ["Tablex 25mm", "Enchapado formica", "Base metalica"],
+    image: "/images/escritorio.png",
   },
   {
     title: "Estanteria Metalica",
