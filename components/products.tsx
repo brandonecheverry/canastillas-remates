@@ -79,6 +79,7 @@ const products = [
       "Contenedores en polietileno con ruedas y tapa, ideales para manejo de residuos y almacenamiento.",
     icon: <Container className="w-7 h-7" />,
     specs: ["Con ruedas", "Incluye tapa", "Polietileno resistente"],
+    image: "/images/contenedores.png",
   },
 ]
 
