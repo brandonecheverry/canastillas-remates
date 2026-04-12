@@ -44,13 +44,13 @@ export function Footer() {
               </a>
               <a
                 href="mailto:canastillasyremates@hotmail.com"
-                className="flex items-center gap-3 text-background/70 hover:text-primary transition-colors text-sm"
+                className="flex items-start gap-3 text-background/70 hover:text-primary transition-colors text-sm"
               >
-                <Mail className="w-4 h-4" />
-                canastillasyremates@hotmail.com
+                <Mail className="w-4 h-4 shrink-0 mt-0.5" />
+                <span className="break-all">canastillasyremates@hotmail.com</span>
               </a>
               <div className="flex items-center gap-3 text-background/70 text-sm">
-                <MapPin className="w-4 h-4" />
+                <MapPin className="w-4 h-4 shrink-0" />
                 Pereira, Risaralda, Colombia
               </div>
             </div>
