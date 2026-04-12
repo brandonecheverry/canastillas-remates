@@ -72,6 +72,7 @@ const products = [
       "Senal de piso humedo para advertencia clara y visible, ideal para espacios interiores y exteriores.",
     icon: <AlertTriangle className="w-7 h-7" />,
     specs: ["Alta visibilidad", "Interior y exterior", "Prevencion de accidentes"],
+    image: "/images/senalizacion.png",
   },
   {
     title: "Contenedores",
