@@ -1,7 +1,4 @@
-"use client"
-
-import { useState } from "react"
-import { MapPin, Phone, Mail, Clock, Send } from "lucide-react"
+import { MapPin, Phone, Mail, Clock, MessageCircle } from "lucide-react"
 
 const contactInfo = [
   {
@@ -12,14 +9,14 @@ const contactInfo = [
   {
     icon: Phone,
     title: "Telefono",
-    content: "+57 300 123 4567",
-    href: "tel:+573001234567",
+    content: "+57 321 702 4720",
+    href: "tel:+573217024720",
   },
   {
     icon: Mail,
     title: "Email",
-    content: "info@canastillasyremates.com",
-    href: "mailto:info@canastillasyremates.com",
+    content: "canastillasyremates@hotmail.com",
+    href: "mailto:canastillasyremates@hotmail.com",
   },
   {
     icon: Clock,
@@ -29,19 +26,11 @@ const contactInfo = [
 ]
 
 export function Contact() {
-  const [formState, setFormState] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    message: "",
-  })
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    // Handle form submission
-    alert("Gracias por contactarnos. Nos comunicaremos contigo pronto.")
-    setFormState({ name: "", email: "", phone: "", message: "" })
-  }
+  const whatsappNumber = "573217024720"
+  const whatsappMessage = encodeURIComponent(
+    "Hola, estoy interesado en sus productos. Me gustaria recibir mas informacion."
+  )
+  const whatsappLink = `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`
 
   return (
     <section id="contacto" className="py-20 md:py-32 bg-secondary text-secondary-foreground">
@@ -109,76 +98,30 @@ export function Contact() {
             </div>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid sm:grid-cols-2 gap-6">
-              <div>
-                <label htmlFor="name" className="block text-sm font-medium mb-2">
-                  Nombre completo
-                </label>
-                <input
-                  type="text"
-                  id="name"
-                  value={formState.name}
-                  onChange={(e) => setFormState({ ...formState, name: e.target.value })}
-                  className="w-full px-4 py-3 bg-secondary-foreground/5 border border-secondary-foreground/10 rounded-xl text-secondary-foreground placeholder:text-secondary-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                  placeholder="Tu nombre"
-                  required
-                />
-              </div>
-              <div>
-                <label htmlFor="phone" className="block text-sm font-medium mb-2">
-                  Telefono
-                </label>
-                <input
-                  type="tel"
-                  id="phone"
-                  value={formState.phone}
-                  onChange={(e) => setFormState({ ...formState, phone: e.target.value })}
-                  className="w-full px-4 py-3 bg-secondary-foreground/5 border border-secondary-foreground/10 rounded-xl text-secondary-foreground placeholder:text-secondary-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                  placeholder="+57 300 000 0000"
-                  required
-                />
-              </div>
+          <div className="flex flex-col items-center justify-center bg-secondary-foreground/5 rounded-2xl p-8 md:p-12 border border-secondary-foreground/10">
+            <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mb-6">
+              <MessageCircle className="w-10 h-10 text-white" />
             </div>
-
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium mb-2">
-                Correo electronico
-              </label>
-              <input
-                type="email"
-                id="email"
-                value={formState.email}
-                onChange={(e) => setFormState({ ...formState, email: e.target.value })}
-                className="w-full px-4 py-3 bg-secondary-foreground/5 border border-secondary-foreground/10 rounded-xl text-secondary-foreground placeholder:text-secondary-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                placeholder="correo@ejemplo.com"
-                required
-              />
-            </div>
-
-            <div>
-              <label htmlFor="message" className="block text-sm font-medium mb-2">
-                Mensaje
-              </label>
-              <textarea
-                id="message"
-                rows={5}
-                value={formState.message}
-                onChange={(e) => setFormState({ ...formState, message: e.target.value })}
-                className="w-full px-4 py-3 bg-secondary-foreground/5 border border-secondary-foreground/10 rounded-xl text-secondary-foreground placeholder:text-secondary-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
-                placeholder="Cuentanos sobre tu proyecto o necesidades..."
-                required
-              />
-            </div>
-
-            <button
-              type="submit"
-              className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground px-6 py-4 rounded-xl text-base font-medium hover:bg-primary/90 transition-colors"
+            <h3 className="font-serif text-2xl font-semibold mb-4 text-center">
+              Escribenos por WhatsApp
+            </h3>
+            <p className="text-secondary-foreground/70 text-center mb-8 max-w-md">
+              La forma mas rapida de obtener informacion sobre nuestros productos. 
+              Te responderemos a la brevedad posible.
+            </p>
+            <a
+              href={whatsappLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-3 bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-xl text-lg font-medium transition-colors"
             >
-              <Send className="w-5 h-5" />
-              Enviar mensaje
-            </button>
-          </form>
+              <MessageCircle className="w-6 h-6" />
+              Iniciar conversacion
+            </a>
+            <p className="text-secondary-foreground/50 text-sm mt-4">
+              +57 321 702 4720
+            </p>
+          </div>
         </div>
       </div>
     </section>

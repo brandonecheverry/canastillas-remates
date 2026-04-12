@@ -36,18 +36,18 @@ export function Footer() {
             </p>
             <div className="space-y-3">
               <a
-                href="tel:+573001234567"
+                href="tel:+573217024720"
                 className="flex items-center gap-3 text-background/70 hover:text-primary transition-colors text-sm"
               >
                 <Phone className="w-4 h-4" />
-                +57 300 123 4567
+                +57 321 702 4720
               </a>
               <a
-                href="mailto:info@canastillasyremates.com"
+                href="mailto:canastillasyremates@hotmail.com"
                 className="flex items-center gap-3 text-background/70 hover:text-primary transition-colors text-sm"
               >
                 <Mail className="w-4 h-4" />
-                info@canastillasyremates.com
+                canastillasyremates@hotmail.com
               </a>
               <div className="flex items-center gap-3 text-background/70 text-sm">
                 <MapPin className="w-4 h-4" />
