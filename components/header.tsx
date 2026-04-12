@@ -43,8 +43,10 @@ export function Header() {
 
           <div className="flex items-center gap-4">
             <a
-              href="tel:+573001234567"
-              className="hidden sm:flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors"
+              href="https://wa.me/573217024720?text=Hola%2C%20me%20interesa%20conocer%20m%C3%A1s%20sobre%20sus%20productos"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden sm:flex items-center gap-2 bg-[#25D366] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#22c55e] transition-colors"
             >
               <Phone className="w-4 h-4" />
               <span>Contactar</span>
@@ -74,8 +76,10 @@ export function Header() {
                 </Link>
               ))}
               <a
-                href="tel:+573001234567"
-                className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-3 rounded-lg text-sm font-medium justify-center mt-2"
+                href="https://wa.me/573217024720?text=Hola%2C%20me%20interesa%20conocer%20m%C3%A1s%20sobre%20sus%20productos"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 bg-[#25D366] text-white px-4 py-3 rounded-lg text-sm font-medium justify-center mt-2"
               >
                 <Phone className="w-4 h-4" />
                 <span>Contactar Ahora</span>
