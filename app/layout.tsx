@@ -39,6 +39,7 @@ export const metadata: Metadata = {
     title: "Canastillas y Remates | Distribuidores Industriales en Pereira",
     description:
       "15 anos distribuyendo canastillas, estibas y mobiliario industrial en Pereira. Soluciones para el sector alimenticio e industrial.",
+    images: [{ url: "/logos/logo_canastillas.jpeg" }],
   },
   twitter: {
     card: "summary_large_image",

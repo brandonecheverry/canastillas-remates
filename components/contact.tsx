@@ -2,11 +2,6 @@ import { MapPin, Phone, Mail, Clock, MessageCircle } from "lucide-react"
 
 const contactInfo = [
   {
-    icon: MapPin,
-    title: "Ubicacion",
-    content: "Pereira, Risaralda, Colombia",
-  },
-  {
     icon: Phone,
     title: "Telefono",
     content: "+57 321 702 4720",
@@ -19,9 +14,14 @@ const contactInfo = [
     href: "mailto:canastillasyremates@hotmail.com",
   },
   {
+    icon: MapPin,
+    title: "Ubicacion",
+    content: "Pereira, Risaralda, Colombia",
+  },
+  {
     icon: Clock,
     title: "Horario",
-    content: "Lun - Vie: 8:00 AM - 6:00 PM",
+    content: "Lun - Vie: 8:00 AM - 6:00 PM · Sab: 8:00 AM - 1:00 PM",
   },
 ]
 
@@ -33,95 +33,79 @@ export function Contact() {
   const whatsappLink = `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`
 
   return (
-    <section id="contacto" className="py-20 md:py-32 bg-secondary text-secondary-foreground">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <span className="inline-block text-primary font-medium text-sm mb-4">
-            CONTACTANOS
+    <section id="contacto" className="py-20 md:py-28 bg-foreground text-white relative overflow-hidden">
+      {/* Decorative shape */}
+      <div className="absolute top-0 right-0 w-96 h-96 bg-primary/10 rounded-full translate-x-32 -translate-y-32 pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-64 h-64 bg-primary/5 rounded-full -translate-x-24 translate-y-24 pointer-events-none" />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+
+        {/* Header */}
+        <div className="text-center mb-14">
+          <span className="inline-block bg-primary text-white text-xs font-bold px-3 py-1 rounded-full mb-4 uppercase tracking-wider">
+            Contacto
           </span>
-          <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold mb-6 text-balance">
-            Hablemos de tu proyecto
+          <h2 className="text-4xl sm:text-5xl font-black leading-tight mb-4">
+            Hablemos de tu{" "}
+            <span className="text-primary">negocio</span>
           </h2>
-          <p className="text-secondary-foreground/70 text-lg leading-relaxed">
-            Estamos listos para ayudarte a encontrar las mejores soluciones para tu negocio.
-            Contactanos hoy mismo.
+          <p className="text-white/60 max-w-md mx-auto">
+            Respondemos rapido. Escribenos por WhatsApp o por cualquiera de nuestros canales.
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16">
-          <div className="space-y-8">
-            <div className="grid sm:grid-cols-2 gap-6">
-              {contactInfo.map((info) => (
-                <div key={info.title} className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-primary/20 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <info.icon className="w-5 h-5 text-primary" />
-                  </div>
-                  <div>
-                    <p className="font-medium text-secondary-foreground mb-1">{info.title}</p>
-                    {info.href ? (
-                      <a
-                        href={info.href}
-                        className="text-secondary-foreground/70 hover:text-primary transition-colors"
-                      >
-                        {info.content}
-                      </a>
-                    ) : (
-                      <p className="text-secondary-foreground/70">{info.content}</p>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
+        <div className="grid lg:grid-cols-2 gap-8 items-start">
 
-            <div className="bg-secondary-foreground/5 rounded-2xl p-6 border border-secondary-foreground/10">
-              <h3 className="font-serif text-xl font-semibold mb-4">
-                Por que elegirnos?
-              </h3>
-              <ul className="space-y-3 text-secondary-foreground/80">
-                <li className="flex items-center gap-3">
-                  <span className="w-2 h-2 bg-primary rounded-full" />
-                  15 anos de experiencia en el mercado
-                </li>
-                <li className="flex items-center gap-3">
-                  <span className="w-2 h-2 bg-primary rounded-full" />
-                  Productos de alta calidad y durabilidad
-                </li>
-                <li className="flex items-center gap-3">
-                  <span className="w-2 h-2 bg-primary rounded-full" />
-                  Atencion personalizada
-                </li>
-                <li className="flex items-center gap-3">
-                  <span className="w-2 h-2 bg-primary rounded-full" />
-                  Precios competitivos
-                </li>
-              </ul>
-            </div>
+          {/* Contact info */}
+          <div className="grid sm:grid-cols-2 gap-4">
+            {contactInfo.map((info) => (
+              <div
+                key={info.title}
+                className="bg-white/5 border border-white/10 rounded-2xl p-5 hover:bg-white/10 transition-colors"
+              >
+                <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center mb-3">
+                  <info.icon className="w-5 h-5 text-white" />
+                </div>
+                <p className="text-xs font-bold text-white/40 uppercase tracking-wider mb-1">
+                  {info.title}
+                </p>
+                {info.href ? (
+                  <a
+                    href={info.href}
+                    className="text-sm font-semibold text-white hover:text-primary transition-colors break-all"
+                  >
+                    {info.content}
+                  </a>
+                ) : (
+                  <p className="text-sm font-semibold text-white">{info.content}</p>
+                )}
+              </div>
+            ))}
           </div>
 
-          <div className="flex flex-col items-center justify-center bg-secondary-foreground/5 rounded-2xl p-8 md:p-12 border border-secondary-foreground/10">
-            <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mb-6">
-              <MessageCircle className="w-10 h-10 text-white" />
+          {/* WhatsApp CTA — main action */}
+          <div className="bg-[#25D366] rounded-3xl p-8 md:p-10 text-center flex flex-col items-center shadow-2xl shadow-[#25D366]/20">
+            <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mb-5">
+              <MessageCircle className="w-8 h-8 text-white" />
             </div>
-            <h3 className="font-serif text-2xl font-semibold mb-4 text-center">
-              Escribenos por WhatsApp
+            <h3 className="text-2xl font-black text-white mb-2">
+              La forma mas rapida
             </h3>
-            <p className="text-secondary-foreground/70 text-center mb-8 max-w-md">
-              La forma mas rapida de obtener informacion sobre nuestros productos. 
-              Te responderemos a la brevedad posible.
+            <p className="text-white/80 mb-8 text-sm leading-relaxed max-w-xs">
+              Escribenos por WhatsApp y te cotizamos en minutos. Sin formularios, sin esperas.
             </p>
             <a
               href={whatsappLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-3 bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-xl text-lg font-medium transition-colors"
+              className="w-full inline-flex items-center justify-center gap-3 bg-white text-[#25D366] px-8 py-4 rounded-xl text-base font-black hover:bg-white/90 transition-all hover:scale-105 shadow-lg"
             >
-              <MessageCircle className="w-6 h-6" />
-              Iniciar conversacion
+              <MessageCircle className="w-5 h-5" />
+              Escribir por WhatsApp
             </a>
-            <p className="text-secondary-foreground/50 text-sm mt-4">
-              +57 321 702 4720
-            </p>
+            <p className="text-white/60 text-xs mt-4 font-medium">+57 321 702 4720</p>
           </div>
+
         </div>
       </div>
     </section>
