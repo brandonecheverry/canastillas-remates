@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState, Suspense } from "react"
+import { useEffect, useRef, useState, useMemo, Suspense } from "react"
 import { Canvas, useFrame } from "@react-three/fiber"
 import { useGLTF, Environment, ContactShadows } from "@react-three/drei"
 import * as THREE from "three"
@@ -42,35 +42,33 @@ function CrateModel({ scrollProgress }: { scrollProgress: number }) {
   const current  = useRef(interpolateStages(0))
   const { scene } = useGLTF("/models/plastic_crate.glb")
 
-  // Enhance materials and center model
-  const model = useRef<THREE.Object3D | null>(null)
-  if (!model.current) {
-    model.current = scene.clone()
+  const model = useMemo(() => {
+    const clone = scene.clone(true)
+
     // Center via bounding box
-    const box = new THREE.Box3().setFromObject(model.current)
+    const box = new THREE.Box3().setFromObject(clone)
     const center = box.getCenter(new THREE.Vector3())
-    model.current.position.sub(center)
+    clone.position.sub(center)
 
     // Enhance every mesh material
-    model.current.traverse((child) => {
+    clone.traverse((child) => {
       if ((child as THREE.Mesh).isMesh) {
         const mesh = child as THREE.Mesh
         mesh.castShadow = true
         mesh.receiveShadow = true
-        if (mesh.material) {
-          const mat = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
-          mat.forEach((m) => {
-            if (m instanceof THREE.MeshStandardMaterial) {
-              m.roughness = 0.4
-              m.metalness = 0.05
-              m.envMapIntensity = 1.5
-              m.needsUpdate = true
-            }
-          })
-        }
+        const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
+        mats.forEach((m) => {
+          if (m instanceof THREE.MeshStandardMaterial) {
+            m.roughness = 0.4
+            m.metalness = 0.05
+            m.envMapIntensity = 1.5
+            m.needsUpdate = true
+          }
+        })
       }
     })
-  }
+    return clone
+  }, [scene])
 
   useFrame((_, delta) => {
     if (!groupRef.current) return
