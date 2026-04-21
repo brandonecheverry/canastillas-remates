@@ -12,7 +12,8 @@ export function Hero() {
   return (
     <section
       id="inicio"
-      className="relative min-h-screen flex items-center pt-20 overflow-hidden bg-white"
+      className="relative min-h-screen flex items-center pt-20 overflow-hidden"
+      style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(2px)" }}
     >
       {/* Background shapes */}
       <div className="absolute top-0 right-0 w-1/2 h-full bg-primary/5 -skew-x-6 origin-top-right translate-x-12" />

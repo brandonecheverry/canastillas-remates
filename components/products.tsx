@@ -90,7 +90,7 @@ const products = [
 
 export function Products() {
   return (
-    <section id="productos" className="py-20 md:py-28 bg-muted/30">
+    <section id="productos" className="py-20 md:py-28" style={{ background: "rgba(255,255,255,0.8)", backdropFilter: "blur(3px)" }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-14">
           <div>

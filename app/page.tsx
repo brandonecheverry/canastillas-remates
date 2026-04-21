@@ -4,18 +4,22 @@ import { Products } from "@/components/products"
 import { About } from "@/components/about"
 import { Contact } from "@/components/contact"
 import { Footer } from "@/components/footer"
+import { CrateBackground } from "@/components/crate-background"
 
 export default function HomePage() {
   return (
     <>
-      <Header />
-      <main>
-        <Hero />
-        <Products />
-        <About />
-        <Contact />
-      </main>
-      <Footer />
+      <CrateBackground />
+      <div className="relative" style={{ zIndex: 1 }}>
+        <Header />
+        <main>
+          <Hero />
+          <Products />
+          <About />
+          <Contact />
+        </main>
+        <Footer />
+      </div>
     </>
   )
 }
