@@ -1,3 +1,5 @@
+"use client"
+
 import {
   Box,
   Layers,
@@ -10,6 +12,7 @@ import {
   Container,
 } from "lucide-react"
 import { ProductCard } from "./product-card"
+import { useInView } from "@/hooks/use-in-view"
 
 const products = [
   {
@@ -87,32 +90,51 @@ const products = [
 ]
 
 export function Products() {
+  const { ref, inView } = useInView(0.1)
+
   return (
-    <section id="productos" className="py-20 md:py-32 bg-muted/30">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <span className="inline-block text-primary font-medium text-sm mb-4">
-            NUESTRO CATALOGO
+    <section id="productos" className="py-24 md:py-36 relative overflow-hidden">
+      {/* Background decoration */}
+      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
+      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
+      <div className="absolute inset-0 bg-grid-pattern bg-grid-md opacity-10" />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+        {/* Header */}
+        <div
+          ref={ref as React.RefObject<HTMLDivElement>}
+          className={`text-center max-w-3xl mx-auto mb-16 transition-all duration-700 ${inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"}`}
+        >
+          <span className="inline-block text-primary font-medium text-xs tracking-widest uppercase mb-4 border border-primary/30 px-4 py-1.5 rounded-full">
+            Nuestro Catalogo
           </span>
           <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-6 text-balance">
-            Productos que impulsan tu operacion
+            Productos que{" "}
+            <span className="shimmer-text">impulsan</span>{" "}
+            tu operacion
           </h2>
           <p className="text-muted-foreground text-lg leading-relaxed">
-            Ofrecemos una amplia gama de productos de alta calidad para el sector
-            alimenticio e industrial, todos con los mejores acabados y materiales.
+            Amplia gama de productos de alta calidad para el sector alimenticio e industrial,
+            con los mejores acabados y materiales del mercado.
           </p>
         </div>
 
+        {/* Grid */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {products.map((product) => (
-            <ProductCard
+          {products.map((product, index) => (
+            <div
               key={product.title}
-              title={product.title}
-              description={product.description}
-              icon={product.icon}
-              specs={product.specs}
-              image={product.image}
-            />
+              className={`transition-all duration-700 ${inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-16"}`}
+              style={{ transitionDelay: `${index * 80}ms` }}
+            >
+              <ProductCard
+                title={product.title}
+                description={product.description}
+                icon={product.icon}
+                specs={product.specs}
+                image={product.image}
+              />
+            </div>
           ))}
         </div>
       </div>

@@ -53,6 +53,14 @@ const config: Config = {
         sans: ["var(--font-inter)"],
         serif: ["var(--font-playfair)"],
       },
+      backgroundImage: {
+        "grid-pattern":
+          "linear-gradient(hsl(220 15% 16% / 0.4) 1px, transparent 1px), linear-gradient(90deg, hsl(220 15% 16% / 0.4) 1px, transparent 1px)",
+      },
+      backgroundSize: {
+        "grid-sm": "40px 40px",
+        "grid-md": "60px 60px",
+      },
     },
   },
   plugins: [require("tailwindcss-animate")],
