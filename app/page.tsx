@@ -1,5 +1,6 @@
 import { Header } from "@/components/header"
 import { Hero } from "@/components/hero"
+import { ScrollScene } from "@/components/scroll-scene"
 import { Products } from "@/components/products"
 import { About } from "@/components/about"
 import { Contact } from "@/components/contact"
@@ -11,6 +12,7 @@ export default function HomePage() {
       <Header />
       <main>
         <Hero />
+        <ScrollScene />
         <Products />
         <About />
         <Contact />
