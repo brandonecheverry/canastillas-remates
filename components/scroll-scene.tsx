@@ -1,25 +1,23 @@
 "use client"
 
-import { useEffect, useRef, useState, useMemo, Suspense } from "react"
-import { Canvas, useFrame, useLoader } from "@react-three/fiber"
-import { Environment } from "@react-three/drei"
-import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js"
-import { TextureLoader } from "three"
+import { useEffect, useRef, useState, Suspense } from "react"
+import { Canvas, useFrame } from "@react-three/fiber"
+import { useGLTF, Environment, ContactShadows } from "@react-three/drei"
 import * as THREE from "three"
 
-// ─── Lerp ─────────────────────────────────────────────────────────────────────
+// ─── Lerp ──────────────────────────────────────────────────────────────────────
 function lerp(a: number, b: number, t: number) {
   return a + (b - a) * t
 }
 
 // ─── Scroll stages ─────────────────────────────────────────────────────────────
 const STAGES = [
-  { at: 0.00, rotX:  0.5,  rotY: -0.8,  rotZ:  0.1,  posY: -2.5, scale: 0.018 },
-  { at: 0.20, rotX:  0.25, rotY: -0.3,  rotZ:  0.0,  posY: -0.5, scale: 0.028 },
-  { at: 0.40, rotX:  0.0,  rotY:  0.35, rotZ:  0.0,  posY:  0.0, scale: 0.034 },
-  { at: 0.60, rotX: -0.15, rotY:  0.9,  rotZ: -0.05, posY:  0.2, scale: 0.036 },
-  { at: 0.80, rotX: -0.35, rotY:  1.6,  rotZ: -0.1,  posY:  0.0, scale: 0.030 },
-  { at: 1.00, rotX: -0.6,  rotY:  2.4,  rotZ: -0.15, posY:  3.0, scale: 0.014 },
+  { at: 0.00, rotX:  0.4,  rotY: -0.6,  rotZ:  0.1,  posY: -1.5, scale: 1.4 },
+  { at: 0.20, rotX:  0.15, rotY: -0.2,  rotZ:  0.0,  posY: -0.3, scale: 2.0 },
+  { at: 0.40, rotX:  0.0,  rotY:  0.5,  rotZ:  0.0,  posY:  0.0, scale: 2.4 },
+  { at: 0.60, rotX: -0.1,  rotY:  1.1,  rotZ: -0.05, posY:  0.2, scale: 2.5 },
+  { at: 0.80, rotX: -0.3,  rotY:  1.8,  rotZ: -0.08, posY:  0.0, scale: 2.1 },
+  { at: 1.00, rotX: -0.5,  rotY:  2.6,  rotZ: -0.12, posY:  3.5, scale: 1.0 },
 ]
 
 function interpolateStages(p: number) {
@@ -38,46 +36,46 @@ function interpolateStages(p: number) {
   }
 }
 
-// ─── OBJ Model ─────────────────────────────────────────────────────────────────
-function CrateOBJ({ scrollProgress }: { scrollProgress: number }) {
+// ─── GLB Model ─────────────────────────────────────────────────────────────────
+function CrateModel({ scrollProgress }: { scrollProgress: number }) {
   const groupRef = useRef<THREE.Group>(null)
   const current  = useRef(interpolateStages(0))
+  const { scene } = useGLTF("/models/plastic_crate.glb")
 
-  const obj      = useLoader(OBJLoader, "/models/crate.obj")
-  const diffuse  = useLoader(TextureLoader, "/models/crate_diff.jpg")
+  // Enhance materials and center model
+  const model = useRef<THREE.Object3D | null>(null)
+  if (!model.current) {
+    model.current = scene.clone()
+    // Center via bounding box
+    const box = new THREE.Box3().setFromObject(model.current)
+    const center = box.getCenter(new THREE.Vector3())
+    model.current.position.sub(center)
 
-  // Apply texture + material to every mesh in the OBJ
-  const model = useMemo(() => {
-    const clone = obj.clone()
-    diffuse.flipY = false
-    diffuse.colorSpace = THREE.SRGBColorSpace
-
-    clone.traverse((child) => {
+    // Enhance every mesh material
+    model.current.traverse((child) => {
       if ((child as THREE.Mesh).isMesh) {
         const mesh = child as THREE.Mesh
-        mesh.material = new THREE.MeshStandardMaterial({
-          map:       diffuse,
-          roughness: 0.45,
-          metalness: 0.05,
-          envMapIntensity: 1.2,
-        })
-        mesh.castShadow    = true
+        mesh.castShadow = true
         mesh.receiveShadow = true
+        if (mesh.material) {
+          const mat = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
+          mat.forEach((m) => {
+            if (m instanceof THREE.MeshStandardMaterial) {
+              m.roughness = 0.4
+              m.metalness = 0.05
+              m.envMapIntensity = 1.5
+              m.needsUpdate = true
+            }
+          })
+        }
       }
     })
-
-    // Center the model using its bounding box
-    const box    = new THREE.Box3().setFromObject(clone)
-    const center = box.getCenter(new THREE.Vector3())
-    clone.position.sub(center)
-
-    return clone
-  }, [obj, diffuse])
+  }
 
   useFrame((_, delta) => {
     if (!groupRef.current) return
     const target = interpolateStages(scrollProgress)
-    const k      = 1 - Math.pow(0.018, delta)
+    const k = 1 - Math.pow(0.02, delta)
 
     current.current.rotX  = lerp(current.current.rotX,  target.rotX,  k)
     current.current.rotY  = lerp(current.current.rotY,  target.rotY,  k)
@@ -85,31 +83,49 @@ function CrateOBJ({ scrollProgress }: { scrollProgress: number }) {
     current.current.posY  = lerp(current.current.posY,  target.posY,  k)
     current.current.scale = lerp(current.current.scale, target.scale, k)
 
-    groupRef.current.rotation.set(current.current.rotX, current.current.rotY, current.current.rotZ)
+    groupRef.current.rotation.set(
+      current.current.rotX,
+      current.current.rotY,
+      current.current.rotZ
+    )
     groupRef.current.position.y = current.current.posY
     groupRef.current.scale.setScalar(current.current.scale)
   })
 
   return (
     <group ref={groupRef}>
-      <primitive object={model} />
-      {/* Warm fill light inside the crate */}
-      <pointLight position={[0, 0, 0]} intensity={60} color="#ff6a20" distance={300} />
+      <primitive object={model.current} />
     </group>
   )
 }
+
+useGLTF.preload("/models/plastic_crate.glb")
 
 // ─── Scene ──────────────────────────────────────────────────────────────────────
 function Scene({ scrollProgress }: { scrollProgress: number }) {
   return (
     <>
-      <ambientLight intensity={0.7} />
-      <directionalLight position={[5, 8,  5]}  intensity={3.5} castShadow />
-      <directionalLight position={[-4, 3, -4]} intensity={1.5} color="#ff8c42" />
-      <spotLight position={[0, 12, 0]} intensity={5} angle={0.4} penumbra={0.9} />
+      <ambientLight intensity={0.6} />
+      <directionalLight position={[6, 10, 6]}   intensity={3} castShadow />
+      <directionalLight position={[-5, 4, -5]}  intensity={1.5} color="#ff8c42" />
+      <spotLight
+        position={[0, 14, 2]}
+        intensity={8}
+        angle={0.35}
+        penumbra={0.8}
+        castShadow
+      />
+      <pointLight position={[4, 0, 4]} intensity={20} color="#ff5500" distance={18} />
       <Environment preset="warehouse" />
+      <ContactShadows
+        position={[0, -2.6, 0]}
+        opacity={0.5}
+        scale={12}
+        blur={2.5}
+        far={6}
+      />
       <Suspense fallback={null}>
-        <CrateOBJ scrollProgress={scrollProgress} />
+        <CrateModel scrollProgress={scrollProgress} />
       </Suspense>
     </>
   )
@@ -156,20 +172,22 @@ export function ScrollScene() {
     <div ref={containerRef} className="relative h-[500vh]">
       <div className="sticky top-0 h-screen w-full overflow-hidden">
 
-        {/* Background */}
+        {/* Background gradient that shifts with scroll */}
         <div
           className="absolute inset-0"
           style={{
-            background: `radial-gradient(ellipse at 50% ${35 + progress * 25}%, hsl(25 55% 9%) 0%, hsl(220 20% 4%) 65%)`,
+            background: `radial-gradient(ellipse at 50% ${30 + progress * 30}%, hsl(25 50% 8%) 0%, hsl(220 18% 4%) 70%)`,
           }}
         />
 
-        {/* Canvas */}
+        {/* 3D Canvas */}
         <Canvas
-          className="absolute inset-0 !h-full !w-full"
-          camera={{ position: [0, 12, 80], fov: 35 }}
+          className="absolute inset-0"
+          style={{ width: "100%", height: "100%" }}
+          camera={{ position: [0, 1, 9], fov: 38 }}
           gl={{ antialias: true, alpha: true }}
           dpr={[1, 1.5]}
+          shadows
         >
           <Scene scrollProgress={progress} />
         </Canvas>
@@ -182,7 +200,8 @@ export function ScrollScene() {
           const opacity = active
             ? fadeIn  ? (progress - stage.minP) / 0.07
             : fadeOut ? 1 - (progress - (stage.maxP - 0.07)) / 0.07
-            : 1 : 0
+            : 1
+            : 0
           return (
             <div
               key={stage.title}
@@ -193,7 +212,9 @@ export function ScrollScene() {
                 transition: "opacity 0.3s ease, transform 0.3s ease",
               }}
             >
-              <p className="text-xs tracking-[0.25em] uppercase text-primary mb-2 font-medium">Canastillas</p>
+              <p className="text-xs tracking-[0.25em] uppercase text-primary mb-2 font-medium">
+                Canastillas Plasticas
+              </p>
               <h3 className="font-serif text-2xl md:text-3xl font-bold text-foreground leading-tight text-balance mb-3">
                 {stage.title}
               </h3>
@@ -223,7 +244,9 @@ export function ScrollScene() {
           className="absolute bottom-10 left-1/2 -translate-x-1/2 text-center pointer-events-none z-10"
           style={{ opacity: Math.max(0, 1 - progress * 8) }}
         >
-          <p className="text-xs tracking-[0.3em] uppercase text-muted-foreground mb-3">Desliza para descubrir</p>
+          <p className="text-xs tracking-[0.3em] uppercase text-muted-foreground mb-3">
+            Desliza para descubrir
+          </p>
           <div className="mx-auto w-px h-10 bg-gradient-to-b from-primary/60 to-transparent animate-pulse" />
         </div>
       </div>
