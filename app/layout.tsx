@@ -15,7 +15,7 @@ const playfair = Playfair_Display({
 export const metadata: Metadata = {
   title: "Canastillas y Remates | Distribuidores Industriales en Pereira",
   description:
-    "Con 15 anos de experiencia, somos lideres en la distribucion de canastillas, estibas plasticas, estanterias metalicas, lockers y mobiliario industrial para el sector alimenticio e industrial en Pereira y la region.",
+    "Con 15 años de experiencia, somos líderes en la distribución de canastillas, estibas plásticas, estanterías metálicas, lockers y mobiliario industrial para el sector alimenticio e industrial en Pereira y la región.",
   keywords: [
     "canastillas plasticas",
     "estibas plasticas",
@@ -38,14 +38,14 @@ export const metadata: Metadata = {
     siteName: "Canastillas y Remates",
     title: "Canastillas y Remates | Distribuidores Industriales en Pereira",
     description:
-      "15 anos distribuyendo canastillas, estibas y mobiliario industrial en Pereira. Soluciones para el sector alimenticio e industrial.",
+      "15 años distribuyendo canastillas, estibas y mobiliario industrial en Pereira. Soluciones para el sector alimenticio e industrial.",
     images: [{ url: "/logos/logo_canastillas.jpeg" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Canastillas y Remates | Distribuidores Industriales",
     description:
-      "15 anos distribuyendo canastillas, estibas y mobiliario industrial en Pereira.",
+      "15 años distribuyendo canastillas, estibas y mobiliario industrial en Pereira.",
   },
   robots: {
     index: true,

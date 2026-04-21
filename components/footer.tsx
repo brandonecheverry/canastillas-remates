@@ -10,10 +10,10 @@ const quickLinks = [
 ]
 
 const products = [
-  "Canastillas Plasticas",
+  "Canastillas Plásticas",
   "Estibas Industriales",
-  "Lockers Metalicos",
-  "Estanteria Metalica",
+  "Lockers Metálicos",
+  "Estantería Metálica",
   "Mobiliario Industrial",
 ]
 
@@ -41,8 +41,8 @@ export function Footer() {
               </div>
             </Link>
             <p className="text-white/55 text-sm leading-relaxed mb-6">
-              15 anos distribuyendo productos de alta calidad para el sector
-              alimenticio e industrial en Pereira y toda la region.
+              15 años distribuyendo productos de alta calidad para el sector
+              alimenticio e industrial en Pereira y toda la región.
             </p>
             <div className="space-y-3">
               <a
@@ -68,7 +68,7 @@ export function Footer() {
 
           <div>
             <h4 className="font-black text-white mb-5 uppercase text-xs tracking-widest">
-              Navegacion
+              Navegación
             </h4>
             <ul className="space-y-3">
               {quickLinks.map((link) => (
@@ -112,7 +112,7 @@ export function Footer() {
                 <p className="text-white/55">8:00 AM — 6:00 PM</p>
               </div>
               <div>
-                <p className="font-bold text-white">Sabado</p>
+                <p className="font-bold text-white">Sábado</p>
                 <p className="text-white/55">8:00 AM — 1:00 PM</p>
               </div>
               <div>

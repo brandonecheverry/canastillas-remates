@@ -1,4 +1,4 @@
-import { ArrowRight, CheckCircle2, Package, Users, Star } from "lucide-react"
+import { ArrowRight, CheckCircle2, Package, Users, Star, FileDown } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 
@@ -29,38 +29,40 @@ export function Hero() {
             </div>
 
             <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black text-foreground leading-[1.05] tracking-tight animate-fade-up">
-              Tu operacion,{" "}
+              Tu operación,{" "}
               <span className="text-primary relative inline-block">
-                sin limites
+                sin límites
                 <svg className="absolute -bottom-2 left-0 w-full" viewBox="0 0 300 12" fill="none">
-                  <path d="M2 8 Q75 2 150 8 Q225 14 298 8" stroke="hsl(25 90% 52%)" strokeWidth="3" strokeLinecap="round" fill="none" opacity="0.5"/>
+                  <path d="M2 8 Q75 2 150 8 Q225 14 298 8" stroke="hsl(25 90% 52%)" strokeWidth="3" strokeLinecap="round" fill="none" opacity="0.5" />
                 </svg>
               </span>
             </h1>
 
             <p className="text-lg text-muted-foreground max-w-lg leading-relaxed animate-fade-up delay-100">
               Canastillas, estibas, lockers y mobiliario industrial para el sector
-              alimenticio e industrial en Pereira y toda la region. Calidad que se nota.
+              alimenticio e industrial en Pereira y toda la región. Calidad que se nota.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 animate-fade-up delay-200">
-              <Link
-                href="#productos"
+              <a
+                href="/documents/catalogo_general.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="inline-flex items-center justify-center gap-2 bg-primary text-white px-7 py-4 rounded-xl text-base font-bold hover:bg-primary/90 transition-all hover:scale-105 shadow-lg shadow-primary/25"
               >
-                Ver Catalogo
-                <ArrowRight className="w-5 h-5" />
-              </Link>
+                <FileDown className="w-5 h-5" />
+                Ver Catálogo PDF
+              </a>
               <Link
                 href="#contacto"
                 className="inline-flex items-center justify-center gap-2 border-2 border-foreground text-foreground px-7 py-4 rounded-xl text-base font-bold hover:bg-foreground hover:text-white transition-all"
               >
-                Pedir Cotizacion
+                Pedir Cotización
               </Link>
             </div>
 
             <div className="flex flex-wrap gap-4 pt-2 animate-fade-up delay-300">
-              {["Envios a toda la region", "Atencion personalizada", "Precios competitivos"].map((f) => (
+              {["Envíos a toda la región", "Atención personalizada", "Precios competitivos"].map((f) => (
                 <div key={f} className="flex items-center gap-2 text-sm font-medium text-foreground/70">
                   <CheckCircle2 className="w-4 h-4 text-primary" />
                   {f}

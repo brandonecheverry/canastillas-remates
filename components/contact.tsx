@@ -3,7 +3,7 @@ import { MapPin, Phone, Mail, Clock, MessageCircle } from "lucide-react"
 const contactInfo = [
   {
     icon: Phone,
-    title: "Telefono",
+    title: "Teléfono",
     content: "+57 321 702 4720",
     href: "tel:+573217024720",
   },
@@ -15,7 +15,7 @@ const contactInfo = [
   },
   {
     icon: MapPin,
-    title: "Ubicacion",
+    title: "Ubicación",
     content: "Pereira, Risaralda, Colombia",
   },
   {
@@ -28,7 +28,7 @@ const contactInfo = [
 export function Contact() {
   const whatsappNumber = "573217024720"
   const whatsappMessage = encodeURIComponent(
-    "Hola, estoy interesado en sus productos. Me gustaria recibir mas informacion."
+    "Hola, estoy interesado en sus productos. Me gustaría recibir más información."
   )
   const whatsappLink = `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`
 
@@ -50,7 +50,7 @@ export function Contact() {
             <span className="text-primary">negocio</span>
           </h2>
           <p className="text-white/60 max-w-md mx-auto">
-            Respondemos rapido. Escribenos por WhatsApp o por cualquiera de nuestros canales.
+            Respondemos rápido. Escríbenos por WhatsApp o por cualquiera de nuestros canales.
           </p>
         </div>
 
@@ -89,7 +89,7 @@ export function Contact() {
               <MessageCircle className="w-8 h-8 text-white" />
             </div>
             <h3 className="text-2xl font-black text-white mb-2">
-              La forma mas rapida
+              La forma más rápida
             </h3>
             <p className="text-white/80 mb-8 text-sm leading-relaxed max-w-xs">
               Escribenos por WhatsApp y te cotizamos en minutos. Sin formularios, sin esperas.
