@@ -1,22 +1,23 @@
 "use client"
 
 import { useEffect, useRef, useState, useMemo } from "react"
-import { Canvas, useFrame, useThree } from "@react-three/fiber"
-import { Environment, MeshTransmissionMaterial } from "@react-three/drei"
+import { Canvas, useFrame } from "@react-three/fiber"
+import { Environment, OrbitControls } from "@react-three/drei"
 import * as THREE from "three"
 
-// ─── Interpolation helpers ──────────────────────────────────────────────────
+// ─── Lerp helper ─────────────────────────────────────────────────────────────
 function lerp(a: number, b: number, t: number) {
   return a + (b - a) * t
 }
 
+// ─── Scroll stages ────────────────────────────────────────────────────────────
 const STAGES = [
-  { at: 0.00, rotX:  0.9, rotY: -0.5, rotZ:  0.1, posY: -2.5, scale: 0.6 },
-  { at: 0.20, rotX:  0.4, rotY: -0.2, rotZ:  0.0, posY: -0.5, scale: 0.9 },
-  { at: 0.40, rotX:  0.0, rotY:  0.3, rotZ:  0.0, posY:  0.0, scale: 1.1 },
-  { at: 0.60, rotX: -0.2, rotY:  0.8, rotZ: -0.05,posY:  0.2, scale: 1.2 },
-  { at: 0.80, rotX: -0.4, rotY:  1.4, rotZ: -0.1, posY:  0.0, scale: 1.1 },
-  { at: 1.00, rotX: -0.7, rotY:  2.2, rotZ: -0.2, posY:  2.0, scale: 0.5 },
+  { at: 0.00, rotX:  0.9, rotY: -0.5, rotZ:  0.1,  posY: -3.0, scale: 0.55 },
+  { at: 0.20, rotX:  0.4, rotY: -0.2, rotZ:  0.0,  posY: -0.5, scale: 0.85 },
+  { at: 0.40, rotX:  0.0, rotY:  0.4, rotZ:  0.0,  posY:  0.0, scale: 1.1  },
+  { at: 0.60, rotX: -0.2, rotY:  0.9, rotZ: -0.05, posY:  0.2, scale: 1.2  },
+  { at: 0.80, rotX: -0.4, rotY:  1.5, rotZ: -0.1,  posY:  0.0, scale: 1.1  },
+  { at: 1.00, rotX: -0.7, rotY:  2.3, rotZ: -0.2,  posY:  3.0, scale: 0.4  },
 ]
 
 function interpolateStages(p: number) {
@@ -35,194 +36,168 @@ function interpolateStages(p: number) {
   }
 }
 
-// ─── Canastilla 3D geometry ─────────────────────────────────────────────────
+// ─── Canastilla 3D Model ──────────────────────────────────────────────────────
 function CanastillaModel({ scrollProgress }: { scrollProgress: number }) {
   const groupRef = useRef<THREE.Group>(null)
-  const targetRef = useRef(interpolateStages(0))
+  const current  = useRef(interpolateStages(0))
+
+  // Shared orange plastic material
+  const mat = useMemo(() => new THREE.MeshStandardMaterial({
+    color: new THREE.Color("#e05a10"),
+    roughness: 0.4,
+    metalness: 0.05,
+  }), [])
+
+  // Dimensions
+  const W = 3.2, D = 2.4, H = 1.5, T = 0.07
+
+  // Bottom floor
+  const floorGeo = useMemo(() => new THREE.BoxGeometry(W, T, D), [W, D, T])
+
+  // Top rim (full width)
+  const rimGeo = useMemo(() => new THREE.BoxGeometry(W, T * 1.8, D), [W, D, T])
+
+  // Corner posts
+  const postGeo = useMemo(() => new THREE.BoxGeometry(T * 2.2, H, T * 2.2), [H, T])
+
+  // Horizontal rails — long side (front/back)
+  const hRailLongGeo = useMemo(() => new THREE.BoxGeometry(W, T, T), [W, T])
+  // Horizontal rails — short side (left/right)
+  const hRailShortGeo = useMemo(() => new THREE.BoxGeometry(T, T, D), [D, T])
+
+  // Vertical slats — long side (front/back)
+  const vSlatLongGeo  = useMemo(() => new THREE.BoxGeometry(T * 1.2, H * 0.58, T * 1.4), [H, T])
+  // Vertical slats — short side (left/right)
+  const vSlatShortGeo = useMemo(() => new THREE.BoxGeometry(T * 1.4, H * 0.58, T * 1.2), [H, T])
+
+  // Bottom grid bars
+  const bgBarXGeo = useMemo(() => new THREE.BoxGeometry(W - T * 2, T * 0.9, T), [W, T])
+  const bgBarZGeo = useMemo(() => new THREE.BoxGeometry(T, T * 0.9, D - T * 2), [D, T])
+
+  // Handle torus
+  const handleGeo = useMemo(() => new THREE.TorusGeometry(0.2, 0.04, 10, 24, Math.PI), [])
+
+  // Pre-compute slat positions
+  const longSlats = useMemo(() => {
+    const count = 9
+    const spacing = (W - T * 2) / (count + 1)
+    return Array.from({ length: count }, (_, i) => -W / 2 + T + spacing * (i + 1))
+  }, [W, T])
+
+  const shortSlats = useMemo(() => {
+    const count = 6
+    const spacing = (D - T * 2) / (count + 1)
+    return Array.from({ length: count }, (_, i) => -D / 2 + T + spacing * (i + 1))
+  }, [D, T])
+
+  const bottomBarsZ = useMemo(() =>
+    Array.from({ length: 4 }, (_, i) => -D / 2 + T + ((D - T * 2) / 5) * (i + 1)), [D, T])
+
+  const bottomBarsX = useMemo(() =>
+    Array.from({ length: 6 }, (_, i) => -W / 2 + T + ((W - T * 2) / 7) * (i + 1)), [W, T])
+
+  const railLevels = useMemo(() => [-0.38, 0, 0.38].map(f => f * H), [H])
 
   useFrame((_, delta) => {
     if (!groupRef.current) return
     const target = interpolateStages(scrollProgress)
-    const k = 1 - Math.pow(0.015, delta)
+    const k = 1 - Math.pow(0.018, delta)
 
-    targetRef.current.rotX  = lerp(targetRef.current.rotX,  target.rotX,  k)
-    targetRef.current.rotY  = lerp(targetRef.current.rotY,  target.rotY,  k)
-    targetRef.current.rotZ  = lerp(targetRef.current.rotZ,  target.rotZ,  k)
-    targetRef.current.posY  = lerp(targetRef.current.posY,  target.posY,  k)
-    targetRef.current.scale = lerp(targetRef.current.scale, target.scale, k)
+    current.current.rotX  = lerp(current.current.rotX,  target.rotX,  k)
+    current.current.rotY  = lerp(current.current.rotY,  target.rotY,  k)
+    current.current.rotZ  = lerp(current.current.rotZ,  target.rotZ,  k)
+    current.current.posY  = lerp(current.current.posY,  target.posY,  k)
+    current.current.scale = lerp(current.current.scale, target.scale, k)
 
-    groupRef.current.rotation.x = targetRef.current.rotX
-    groupRef.current.rotation.y = targetRef.current.rotY
-    groupRef.current.rotation.z = targetRef.current.rotZ
-    groupRef.current.position.y = targetRef.current.posY
-    groupRef.current.scale.setScalar(targetRef.current.scale)
+    groupRef.current.rotation.set(current.current.rotX, current.current.rotY, current.current.rotZ)
+    groupRef.current.position.y = current.current.posY
+    groupRef.current.scale.setScalar(current.current.scale)
   })
 
-  // Shared material — bright orange plastic
-  const plasticMat = useMemo(
-    () =>
-      new THREE.MeshStandardMaterial({
-        color: new THREE.Color("#e05a10"),
-        roughness: 0.35,
-        metalness: 0.05,
-        envMapIntensity: 1.2,
-      }),
-    []
-  )
-
-  // Dimensions
-  const W = 3.2, D = 2.4, H = 1.4, T = 0.07 // width, depth, height, thickness
-
-  // Slat geometry for the side ventilation bars
-  const slatGeo = useMemo(() => new THREE.BoxGeometry(T, H * 0.55, T * 1.5), [])
-  const hSlatGeo = useMemo(() => new THREE.BoxGeometry(W * 0.28, T, T * 1.5), [])
-
-  // Build vertical slats for the long sides
-  const longSideSlats = useMemo(() => {
-    const count = 9
-    const spacing = (W - T * 2) / (count + 1)
-    return Array.from({ length: count }, (_, i) => ({
-      x: -W / 2 + T + spacing * (i + 1),
-      y: 0,
-      z: D / 2,
-    }))
-  }, [])
-
-  // Build vertical slats for the short sides
-  const shortSideSlats = useMemo(() => {
-    const count = 6
-    const spacing = (D - T * 2) / (count + 1)
-    return Array.from({ length: count }, (_, i) => ({
-      x: W / 2,
-      y: 0,
-      z: -D / 2 + T + spacing * (i + 1),
-    }))
-  }, [])
-
-  // Handle geometry
-  const handleGeo = useMemo(
-    () => new THREE.TorusGeometry(0.22, 0.045, 10, 24, Math.PI),
-    []
-  )
-
-  // Bottom grid bars
-  const bottomBarGeo = useMemo(() => new THREE.BoxGeometry(W - T * 2, T * 0.8, T), [])
-  const bottomBarGeoB = useMemo(() => new THREE.BoxGeometry(T, T * 0.8, D - T * 2), [])
-
-  const bottomBarsX = useMemo(
-    () => Array.from({ length: 5 }, (_, i) => -D / 2 + T + ((D - T * 2) / 6) * (i + 1)),
-    []
-  )
-  const bottomBarsZ = useMemo(
-    () => Array.from({ length: 7 }, (_, i) => -W / 2 + T + ((W - T * 2) / 8) * (i + 1)),
-    []
-  )
+  const corners: [number, number][] = [
+    [-W / 2 + T / 2,  D / 2 - T / 2],
+    [ W / 2 - T / 2,  D / 2 - T / 2],
+    [-W / 2 + T / 2, -D / 2 + T / 2],
+    [ W / 2 - T / 2, -D / 2 + T / 2],
+  ]
 
   return (
     <group ref={groupRef}>
-      {/* ── Bottom panel frame ── */}
-      {/* Floor outer frame */}
-      <mesh geometry={new THREE.BoxGeometry(W, T, D)} material={plasticMat} position={[0, -H / 2, 0]} />
+      {/* Floor */}
+      <mesh geometry={floorGeo} material={mat} position={[0, -H / 2, 0]} />
 
-      {/* ── Bottom grid ── */}
-      {bottomBarsX.map((z, i) => (
-        <mesh key={`bx-${i}`} geometry={bottomBarGeo} material={plasticMat} position={[0, -H / 2 + T / 2, z]} />
+      {/* Bottom grid — cross bars */}
+      {bottomBarsZ.map((z, i) => (
+        <mesh key={`bgx-${i}`} geometry={bgBarXGeo} material={mat} position={[0, -H / 2 + T / 2, z]} />
       ))}
-      {bottomBarsZ.map((x, i) => (
-        <mesh key={`bz-${i}`} geometry={bottomBarGeoB} material={plasticMat} position={[x, -H / 2 + T / 2, 0]} />
-      ))}
-
-      {/* ── Four vertical corner posts ── */}
-      {[[-W/2+T/2, D/2-T/2], [W/2-T/2, D/2-T/2], [-W/2+T/2, -D/2+T/2], [W/2-T/2, -D/2+T/2]].map(([x, z], i) => (
-        <mesh key={`post-${i}`} material={plasticMat} position={[x as number, 0, z as number]}>
-          <boxGeometry args={[T * 2, H, T * 2]} />
-        </mesh>
+      {bottomBarsX.map((x, i) => (
+        <mesh key={`bgz-${i}`} geometry={bgBarZGeo} material={mat} position={[x, -H / 2 + T / 2, 0]} />
       ))}
 
-      {/* ── Top rim ── */}
-      <mesh material={plasticMat} position={[0, H / 2, 0]}>
-        <boxGeometry args={[W, T * 1.5, D]} />
-      </mesh>
-      {/* Top rim inner cutout — subtract via smaller inset box with different material */}
-      <mesh material={plasticMat} position={[0, H / 2 - T / 4, 0]}>
-        <boxGeometry args={[W - T * 3, T * 1.5, D - T * 3]} />
-      </mesh>
+      {/* Corner posts */}
+      {corners.map(([x, z], i) => (
+        <mesh key={`post-${i}`} geometry={postGeo} material={mat} position={[x, 0, z]} />
+      ))}
 
-      {/* ── Long side walls — horizontal rails ── */}
-      {[-1, 0, 1].map((lvl, li) => (
-        <group key={`rl-${li}`}>
-          {/* front */}
-          <mesh material={plasticMat} position={[0, lvl * (H / 3.5), D / 2]}>
-            <boxGeometry args={[W, T, T]} />
-          </mesh>
-          {/* back */}
-          <mesh material={plasticMat} position={[0, lvl * (H / 3.5), -D / 2]}>
-            <boxGeometry args={[W, T, T]} />
-          </mesh>
-          {/* left */}
-          <mesh material={plasticMat} position={[-W / 2, lvl * (H / 3.5), 0]}>
-            <boxGeometry args={[T, T, D]} />
-          </mesh>
-          {/* right */}
-          <mesh material={plasticMat} position={[W / 2, lvl * (H / 3.5), 0]}>
-            <boxGeometry args={[T, T, D]} />
-          </mesh>
+      {/* Top rim */}
+      <mesh geometry={rimGeo} material={mat} position={[0, H / 2, 0]} />
+
+      {/* Horizontal rails on all 4 sides — 3 levels */}
+      {railLevels.map((y, li) => (
+        <group key={`rail-${li}`}>
+          <mesh geometry={hRailLongGeo}  material={mat} position={[0,  y,  D / 2]} />
+          <mesh geometry={hRailLongGeo}  material={mat} position={[0,  y, -D / 2]} />
+          <mesh geometry={hRailShortGeo} material={mat} position={[-W / 2, y, 0]} />
+          <mesh geometry={hRailShortGeo} material={mat} position={[ W / 2, y, 0]} />
         </group>
       ))}
 
-      {/* ── Long side vertical ventilation slats (front & back) ── */}
-      {longSideSlats.map((s, i) => (
+      {/* Vertical slats — front & back */}
+      {longSlats.map((x, i) => (
         <group key={`ls-${i}`}>
-          <mesh geometry={slatGeo} material={plasticMat} position={[s.x, s.y, s.z]} />
-          <mesh geometry={slatGeo} material={plasticMat} position={[s.x, s.y, -s.z]} />
+          <mesh geometry={vSlatLongGeo} material={mat} position={[x, 0,  D / 2]} />
+          <mesh geometry={vSlatLongGeo} material={mat} position={[x, 0, -D / 2]} />
         </group>
       ))}
 
-      {/* ── Short side vertical ventilation slats (left & right) ── */}
-      {shortSideSlats.map((s, i) => (
+      {/* Vertical slats — left & right */}
+      {shortSlats.map((z, i) => (
         <group key={`ss-${i}`}>
-          <mesh material={plasticMat} position={[s.x, s.y, s.z]}>
-            <boxGeometry args={[T * 1.5, H * 0.55, T]} />
-          </mesh>
-          <mesh material={plasticMat} position={[-s.x, s.y, s.z]}>
-            <boxGeometry args={[T * 1.5, H * 0.55, T]} />
-          </mesh>
+          <mesh geometry={vSlatShortGeo} material={mat} position={[-W / 2, 0, z]} />
+          <mesh geometry={vSlatShortGeo} material={mat} position={[ W / 2, 0, z]} />
         </group>
       ))}
 
-      {/* ── Handles ── */}
-      {[-1, 1].map((side, i) => (
-        <mesh
-          key={`handle-${i}`}
-          geometry={handleGeo}
-          material={plasticMat}
-          position={[side * (W / 2 - 0.02), H / 2 - 0.05, 0]}
-          rotation={[Math.PI / 2, side * Math.PI / 2, 0]}
-        />
-      ))}
+      {/* Handles on left & right */}
+      <mesh geometry={handleGeo} material={mat}
+        position={[-(W / 2 + 0.01), H / 2 - 0.08, 0]}
+        rotation={[Math.PI / 2, -Math.PI / 2, 0]} />
+      <mesh geometry={handleGeo} material={mat}
+        position={[W / 2 + 0.01, H / 2 - 0.08, 0]}
+        rotation={[Math.PI / 2,  Math.PI / 2, 0]} />
 
-      {/* ── Ambient fill light from below ── */}
-      <pointLight position={[0, -3, 2]} intensity={0.6} color="#ff6a20" />
-      <pointLight position={[3, 2, 3]}  intensity={0.8} color="#ffffff" />
+      {/* Accent lights inside */}
+      <pointLight position={[0, -1, 0]} intensity={1.5} color="#ff6a20" distance={5} />
+      <pointLight position={[0,  2, 2]} intensity={0.8} color="#ffffff"  distance={8} />
     </group>
   )
 }
 
-// ─── Scene wrapper ─────────────────────────────────────────────────────────
+// ─── Scene ────────────────────────────────────────────────────────────────────
 function Scene({ scrollProgress }: { scrollProgress: number }) {
   return (
     <>
-      <ambientLight intensity={0.5} />
-      <directionalLight position={[5, 8, 5]}  intensity={2.5} castShadow />
-      <directionalLight position={[-5, 3, -3]} intensity={0.8} color="#ff8c42" />
-      <spotLight position={[0, 8, 0]} intensity={3} angle={0.4} penumbra={0.8} color="#ffffff" />
+      <ambientLight intensity={0.6} />
+      <directionalLight position={[5, 8,  5]}  intensity={3}   castShadow />
+      <directionalLight position={[-4, 3, -3]} intensity={1.2} color="#ff8c42" />
+      <spotLight position={[0, 10, 0]} intensity={4} angle={0.35} penumbra={0.9} />
       <Environment preset="warehouse" />
       <CanastillaModel scrollProgress={scrollProgress} />
     </>
   )
 }
 
-// ─── Text stages ────────────────────────────────────────────────────────────
+// ─── Narrative text stages ────────────────────────────────────────────────────
 const TEXT_STAGES = [
   {
     minP: 0.08, maxP: 0.32,
@@ -241,19 +216,18 @@ const TEXT_STAGES = [
   },
 ]
 
-// ─── Main export ────────────────────────────────────────────────────────────
+// ─── Main export ──────────────────────────────────────────────────────────────
 export function ScrollScene() {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const [scrollProgress, setScrollProgress] = useState(0)
+  const containerRef  = useRef<HTMLDivElement>(null)
+  const [progress, setProgress] = useState(0)
 
   useEffect(() => {
     const onScroll = () => {
       const el = containerRef.current
       if (!el) return
-      const rect = el.getBoundingClientRect()
+      const rect        = el.getBoundingClientRect()
       const totalHeight = el.offsetHeight - window.innerHeight
-      const p = Math.min(1, Math.max(0, -rect.top / totalHeight))
-      setScrollProgress(p)
+      setProgress(Math.min(1, Math.max(0, -rect.top / totalHeight)))
     }
     window.addEventListener("scroll", onScroll, { passive: true })
     onScroll()
@@ -262,49 +236,46 @@ export function ScrollScene() {
 
   return (
     <div ref={containerRef} className="relative h-[500vh]">
-      {/* Sticky viewport */}
       <div className="sticky top-0 h-screen w-full overflow-hidden">
-        {/* Background gradient */}
+
+        {/* Dark radial background */}
         <div
-          className="absolute inset-0 transition-all duration-300"
+          className="absolute inset-0"
           style={{
-            background: `radial-gradient(ellipse at 50% ${40 + scrollProgress * 20}%, hsl(28 60% 12% / 0.9) 0%, hsl(220 20% 4%) 65%)`,
+            background: `radial-gradient(ellipse at 50% ${35 + progress * 25}%, hsl(25 55% 10%) 0%, hsl(220 20% 4%) 65%)`,
           }}
         />
 
         {/* Three.js Canvas */}
         <Canvas
-          className="absolute inset-0"
-          camera={{ position: [0, 0.8, 5.5], fov: 42 }}
+          className="absolute inset-0 !h-full !w-full"
+          camera={{ position: [0, 0.6, 5.8], fov: 40 }}
           gl={{ antialias: true, alpha: true }}
-          dpr={[1, 2]}
+          dpr={[1, 1.5]}
         >
-          <Scene scrollProgress={scrollProgress} />
+          <Scene scrollProgress={progress} />
         </Canvas>
 
-        {/* Narrative text */}
+        {/* Narrative texts */}
         {TEXT_STAGES.map((stage) => {
-          const visible = scrollProgress >= stage.minP && scrollProgress <= stage.maxP
-          const fadeIn  = scrollProgress >= stage.minP && scrollProgress <= stage.minP + 0.07
-          const fadeOut = scrollProgress >= stage.maxP - 0.07 && scrollProgress <= stage.maxP
-          const localT  = fadeIn
-            ? (scrollProgress - stage.minP) / 0.07
-            : fadeOut
-            ? 1 - (scrollProgress - (stage.maxP - 0.07)) / 0.07
-            : 1
+          const active  = progress >= stage.minP && progress <= stage.maxP
+          const fadeIn  = progress >= stage.minP && progress <= stage.minP + 0.07
+          const fadeOut = progress >= stage.maxP - 0.07 && progress <= stage.maxP
+          const opacity = active
+            ? fadeIn  ? (progress - stage.minP) / 0.07
+            : fadeOut ? 1 - (progress - (stage.maxP - 0.07)) / 0.07
+            : 1 : 0
           return (
             <div
               key={stage.title}
               className="absolute left-6 md:left-16 top-1/2 max-w-[260px] pointer-events-none z-10"
               style={{
-                opacity: visible ? localT : 0,
-                transform: `translateY(calc(-50% + ${visible ? 0 : 24}px))`,
-                transition: "opacity 0.35s ease, transform 0.35s ease",
+                opacity,
+                transform: `translateY(calc(-50% + ${active ? 0 : 20}px))`,
+                transition: "opacity 0.3s ease, transform 0.3s ease",
               }}
             >
-              <p className="text-xs tracking-[0.25em] uppercase text-primary mb-2 font-medium">
-                Canastillas
-              </p>
+              <p className="text-xs tracking-[0.25em] uppercase text-primary mb-2 font-medium">Canastillas</p>
               <h3 className="font-serif text-2xl md:text-3xl font-bold text-foreground leading-tight text-balance mb-3">
                 {stage.title}
               </h3>
@@ -314,27 +285,25 @@ export function ScrollScene() {
         })}
 
         {/* Scroll progress bar */}
-        <div className="absolute right-6 md:right-10 top-1/2 -translate-y-1/2 flex flex-col items-center gap-2 z-10">
-          <div className="w-px h-28 bg-border/30 rounded-full overflow-hidden">
+        <div className="absolute right-6 md:right-10 top-1/2 -translate-y-1/2 flex flex-col items-center gap-2 z-10 pointer-events-none">
+          <div className="w-px h-28 bg-white/10 rounded-full overflow-hidden">
             <div
               className="w-full bg-primary rounded-full"
-              style={{ height: `${scrollProgress * 100}%`, transition: "height 0.1s linear" }}
+              style={{ height: `${progress * 100}%`, transition: "height 0.1s linear" }}
             />
           </div>
           <span className="text-[9px] tracking-widest text-muted-foreground"
             style={{ writingMode: "vertical-rl" }}>
-            {Math.round(scrollProgress * 100)}%
+            {Math.round(progress * 100)}%
           </span>
         </div>
 
         {/* Initial scroll hint */}
         <div
           className="absolute bottom-10 left-1/2 -translate-x-1/2 text-center pointer-events-none z-10"
-          style={{ opacity: Math.max(0, 1 - scrollProgress * 8) }}
+          style={{ opacity: Math.max(0, 1 - progress * 8) }}
         >
-          <p className="text-xs tracking-[0.3em] uppercase text-muted-foreground mb-3">
-            Desliza para descubrir
-          </p>
+          <p className="text-xs tracking-[0.3em] uppercase text-muted-foreground mb-3">Desliza para descubrir</p>
           <div className="mx-auto w-px h-10 bg-gradient-to-b from-primary/60 to-transparent animate-pulse" />
         </div>
       </div>
