@@ -31,11 +31,8 @@ export function Hero() {
 
             <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black text-foreground leading-[1.05] tracking-tight animate-fade-up">
               Tu operación,{" "}
-              <span className="text-primary relative inline-block">
+              <span className="text-primary">
                 sin límites
-                <svg className="absolute -bottom-2 left-0 w-full" viewBox="0 0 300 12" fill="none">
-                  <path d="M2 8 Q75 2 150 8 Q225 14 298 8" stroke="hsl(25 90% 52%)" strokeWidth="3" strokeLinecap="round" fill="none" opacity="0.5" />
-                </svg>
               </span>
             </h1>
 
